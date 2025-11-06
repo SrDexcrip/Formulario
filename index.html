@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Galería / Proyectos destacados</title>
+ 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- NAV-BAR -->
+<style>
+    .main-nav {
+        background-color: #333;
+        padding: 10px 0;
+        margin-bottom: 30px;
+        width: 100%;
+    }
+    .main-nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+    }
+    .main-nav li {
+        margin: 0 15px;
+    }
+    .main-nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+    .main-nav a:hover, .main-nav a.active {
+        background-color: #007bff;
+    }
+    /* Estilos para el nuevo botón de contacto */
+    .hero-actions {
+        margin-top: 25px;
+    }
+    .contact-button {
+        background-color: #28a745; /* Color verde para llamar la atención */
+        color: white;
+        padding: 12px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+        transition: background-color 0.3s;
+        text-align: center;
+    }
+    .contact-button:hover {
+        background-color: #218838;
+    }
+</style>
+<nav class="main-nav">
+    <ul>
+        <li><a href="/index.html" class="active">Inicio</a></li>
+        <li><a href="/apps/mensajes-vue/">Ver Mensajes</a></li>
+        <li><a href="/formulario.html">Formulario JS</a></li>
+        <li><a href="/apps/contacto-php/">Contacto PHP</a></li>
+    </ul>
+</nav>
+<!-- FIN NAV-BAR -->
+    <div class="container">
+      <!-- Sección principal tipo CV / Portada: foto, nombre, rol y datos de contacto -->
+      <section class="hero">
+        <div class="hero-left">
+          <img class="profile-pic" src="assets\Imagen de WhatsApp 2025-11-01 a las 12.14.05_4954b4e2.jpg" alt="Foto del alumno" onerror="this.onerror=null;this.src='https://via.placeholder.com/400?text=Foto'" />
+          <a class="cv-download" href="formulario.html" target="_blank" rel="noopener">Descargar CV</a>
+          <a class="cv-download" href="/apps/mensajes-vue/" rel="noopener" style="margin-top: 10px;">Gestor de Mensajes</a>
+        </div>
+        <div class="hero-right">
+          <h1 class="hero-name">Fansico Antonio luna marin</h1>
+          <p class="hero-role">Desarrollador Web / Diseñador UI — Portafolio Profesional</p>
+          <p class="hero-summary">Breve presentación: Soy un desarrollador front-end con experiencia en HTML, CSS y JavaScript. Me enfoco en crear interfaces accesibles, responsivas y con buen rendimiento.</p>
+
+          <div class="contact-list">
+            <span class="contact-item">📍 Xalapa.ver Mexxico</span>
+            <span class="contact-item">✉️ luna_marin@gmail.com</span>
+            <span class="contact-item">🔗 linkedin.com</span>
+          </div>
+
+          <div class="skills">
+            <span class="skill">HTML</span>
+            <span class="skill">CSS</span>
+            <span class="skill">JavaScript</span>
+            <span class="skill">Vue</span>
+          </div>
+
+          <!-- BOTÓN DE CONTACTO AÑADIDO -->
+          <div class="hero-actions">
+            <a class="contact-button" href="/apps/contacto-php/">¡Contáctame ahora!</a>
+          </div>
+
+        </div>
+      </section>
+
+      <header class="site-header">
+        <p class="lead">Galería — Proyectos destacados</p>
+        <p>Ejemplo de manipulación del DOM con JavaScript (sin recargar la página).</p>
+      </header>
+
+    <section class="controls">
+      <div class="filter-group">
+        <button class="filter-btn" data-filter="all">Todos</button>
+        <button class="filter-btn" data-filter="web">Web</button>
+        <button class="filter-btn" data-filter="diseño">Diseño</button>
+        <button class="filter-btn" data-filter="js">JavaScript</button>
+      </div>
+
+      <div class="actions">
+        <button id="toggle-js">Ocultar/Mostrar categoría "JavaScript"</button>
+        <button id="edit-card">Cambiar primera tarjeta (texto + imagen)</button>
+      </div>
+    </section>
+    <main>
+      <section id="gallery" class="gallery">
+
+        <article class="card" data-category="web" id="card-1">
+         
+          <img src="assets/proyecto1.jpg" alt="Proyecto 1" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x240?text=Proyecto+1'" />
+          <h3>Proyecto Web 1</h3>
+          <p>Landing page responsiva creada con HTML/CSS.</p>
+        </article>
+
+        <article class="card" data-category="diseño" id="card-2">
+          <img src="assets/proyecto2.jpg" alt="Proyecto 2" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x240?text=Proyecto+2'" />
+          <h3>Proyecto Diseño 2</h3>
+          <p>Identidad visual y branding para cliente ficticio.</p>
+        </article>
+
+        <article class="card" data-category="js" id="card-3">
+          <img src="assets/proyecto3.jpg" alt="Proyecto 3" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x240?text=Proyecto+3'" />
+          <h3>Proyecto JS 3</h3>
+          <p>Aplicación interactiva usando Vanilla JS.</p>
+        </article>
+
+        <article class="card" data-category="web" id="card-4">
+          <img src="assets/formulario.jpg" alt="Formulario proyecto" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x240?text=Formulario'" />
+          <h3>Proyecto: Formulario de Registro</h3>
+          <p>Formulario interactivo con validación en cliente. Haz clic en el botón para abrir el proyecto completo.</p>
+          <div class="meta">
+            <span class="tag">Web</span>
+            <span class="tag">Validación</span>
+          </div>
+          <div class="project-actions">
+            <a class="btn-secondary" href="#" onclick="alert('Vista previa rápida: abre formulario en nueva pestaña');return false;">Vista previa</a>
+            <a class="btn-primary" href="formulario.html" target="_blank" rel="noopener">Abrir formulario</a>
+          </div>
+        </article>
+
+        <article class="card" data-category="diseño" id="card-5">
+          <img src="assets/proyecto5.jpg" alt="Proyecto 5" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x240?text=Proyecto+5'" />
+          <h3>Proyecto Diseño 5</h3>
+          <p>Proyecto editorial: maquetación y prototipos.</p>
+        </article>
+
+        <article class="card" data-category="js" id="card-6">
+          <img src="assets/proyecto6.jpg" alt="Proyecto 6" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x240?text=Proyecto+6'" />
+          <h3>Proyecto JS 6</h3>
+          <p>Mini-juego implementado con Canvas y eventos.</p>
+        </article>
+      </section>
+      
+    </main>
+
+    </div>
+
+    <footer>
+      <p>Alumno: Fansico Antonio luna marin.</p>
+    </footer>
+
+    <section class="vue-demo container">
+      <h2>Demo: componente reutilizable (Vue)</h2>
+      <div id="vue-app">
+        <div class="vue-grid">
+          <project-card v-for="(p,index) in projects" :key="index" :title="p.title" :description="p.description" :image="p.image" :accent="p.accent"></project-card>
+        </div>
+      </div>
+    </section>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.jpg"></script>
+  <script src="components/project-card.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

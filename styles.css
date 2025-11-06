@@ -1,0 +1,96 @@
+:root{
+  --bg: linear-gradient(180deg,#f6f8fb 0%, #f1f6ff 100%);
+  --card-bg: #ffffff;
+  --accent: #0066cc; /* azul profesional */
+  --accent-2: #00a99d; /* color secundario */
+  --muted: #5b6b78;
+  --glass: rgba(255,255,255,0.7);
+}
+*{box-sizing:border-box}
+body{
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  margin:0; padding:28px; background:var(--bg); color:#16202a; -webkit-font-smoothing:antialiased;
+}
+.container{max-width:1180px;margin:0 auto;padding:28px}
+.site-header{margin-bottom:20px;text-align:center}
+.site-header h1{font-weight:700;letter-spacing:-0.5px}
+.site-header p{color:var(--muted);margin-top:6px;font-size:0.98rem}
+/* HERO / CV: presentación inicial */
+.hero{display:grid;grid-template-columns:220px 1fr;gap:22px;align-items:center;margin-bottom:26px}
+.hero-left{display:flex;flex-direction:column;align-items:center;gap:12px}
+.profile-pic{width:200px;height:200px;border-radius:16px;object-fit:cover;box-shadow:0 10px 30px rgba(12,24,40,0.12);border:6px solid rgba(255,255,255,0.7)}
+.cv-download{display:inline-block;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:8px 12px;border-radius:10px;text-decoration:none;font-weight:700}
+.hero-right{padding:6px 0}
+.hero-name{font-size:1.8rem;margin:0;color:#061826}
+.hero-role{color:var(--accent);font-weight:700;margin:8px 0}
+.hero-summary{color:var(--muted);margin-bottom:12px;line-height:1.45}
+.contact-list{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.contact-item{background:rgba(0,0,0,0.03);padding:6px 10px;border-radius:999px;font-size:0.95rem}
+.skills{display:flex;gap:8px;flex-wrap:wrap}
+.skill{background:rgba(0,0,0,0.05);padding:6px 10px;border-radius:999px;font-weight:600;color:var(--muted)}
+
+.lead{font-size:1.05rem;font-weight:600;margin:0}
+.controls{display:flex;gap:16px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.filter-group{display:flex;gap:8px}
+.filter-btn{background:transparent;border:1px solid rgba(22,32,42,0.06);padding:10px 14px;border-radius:999px;cursor:pointer;transition:all .16s;font-weight:600;color:var(--muted)}
+.filter-btn.active{border-color:var(--accent);background:linear-gradient(90deg, rgba(0,102,204,0.08), rgba(0,169,157,0.04));color:var(--accent)}
+.filter-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(6,24,44,0.04)}
+.actions{display:flex;gap:8px}
+#toggle-js,#edit-card{padding:10px 14px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;box-shadow:0 6px 18px rgba(0,102,204,0.12);transition:transform .12s;font-weight:700}
+
+#toggle-js:hover,#edit-card:hover{transform:translateY(-2px)}
+
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+.card{background:linear-gradient(180deg,var(--glass),var(--card-bg));border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(12,24,40,0.06);padding-bottom:14px;transition:transform .18s,box-shadow .18s}
+.card:hover{transform:translateY(-8px);box-shadow:0 28px 60px rgba(12,24,40,0.10)}
+.card img{width:100%;height:150px;object-fit:cover;display:block}
+.card h3{margin:14px 16px 6px 16px;font-size:1.06rem;color:#0f1720}
+.card p{margin:0 16px 14px 16px;color:var(--muted);font-size:0.95rem}
+.card .meta{display:flex;justify-content:space-between;align-items:center;padding:0 16px 12px 16px}
+.tag{background:rgba(0,0,0,0.04);padding:6px 10px;border-radius:999px;font-weight:700;font-size:0.85rem}
+.card .project-actions{display:flex;gap:8px;justify-content:flex-end;padding:0 16px 16px 16px}
+.btn-secondary{background:transparent;border:1px solid rgba(6,24,44,0.06);padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--muted)}
+.btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:8px 12px;border-radius:10px;text-decoration:none;font-weight:700}
+
+.hidden{display:none !important}
+
+footer{margin-top:24px;color:var(--muted)}
+
+@media (max-width:420px){
+  .controls{flex-direction:column;align-items:stretch}
+  .actions{justify-content:space-between}
+}
+
+/* Estilos del formulario dentro de una card */
+.card .card-form{padding:14px;border-top:1px solid rgba(6,24,44,0.04);background:linear-gradient(180deg,transparent,rgba(255,255,255,0.6))}
+.card .card-form .form-group{margin-bottom:10px}
+.card .card-form label{display:block;margin-bottom:6px;font-weight:600}
+.card .card-form input{width:100%;padding:10px;border:1px solid #e6e9ef;border-radius:8px}
+.card .card-form input.error{border-color:#e53e3e;background:#fff5f5}
+.card .card-form input.valid{border-color:#48bb78}
+.card .card-form .error-message{color:#e53e3e;margin-top:6px;font-size:0.9rem;display:none}
+.card .card-form .form-success{padding:12px;background:#f2fbf3;border-left:4px solid #48bb78;border-radius:6px;margin-top:12px}
+
+/* Estilos para acciones dentro de la card (enlace/botón que abre el formulario) */
+.card-actions{padding:12px;border-top:1px solid rgba(6,24,44,0.04);display:flex;justify-content:flex-end}
+.card-link{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:10px 14px;border-radius:12px;text-decoration:none;border:0;box-shadow:0 12px 30px rgba(0,102,204,0.12);transition:transform .14s,box-shadow .14s}
+.card-link:hover{transform:translateY(-4px);box-shadow:0 28px 60px rgba(12,24,40,0.12)}
+
+/* Botón de enviar dentro del formulario (si existe) */
+.card .card-form button[type="submit"]{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+.card .card-form button[type="submit"]:hover{background:#255a93}
+
+/* Estilos para la demo de Vue */
+.vue-demo{margin-top:36px}
+.vue-demo h2{text-align:center;margin-bottom:12px}
+.vue-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.vue-card{border:4px solid transparent;padding-bottom:12px}
+.vue-card img{height:120px;object-fit:cover}
+.vue-card h3{margin:12px}
+.vue-card p{margin:0 12px 12px 12px;color:var(--muted)}
+.vue-actions{display:flex;gap:8px;padding:12px;justify-content:flex-end}
+.vue-actions button{background:#fff;border:1px solid #ddd;padding:8px 10px;border-radius:8px;cursor:pointer}
+.vue-actions button:hover{transform:translateY(-3px)}
+
+
+
