@@ -1,8 +1,10 @@
 <?php
-require_once 'Mensajes.php';
+// Incluir la configuración y la clase, asegurando que las rutas sean correctas.
+require_once 'supabase_config.php';
+require_once 'components/GestorMensajes.php';
 
-$gestorMensajes = new Mensajes();
-$mensajes = $gestorMensajes->getMensajes();
+// Pasar las credenciales al método estático para obtener los mensajes.
+$mensajes = GestorMensajes::obtenerTodos($supabase_url, $supabase_key);
 ?>
 
 <!DOCTYPE html>
@@ -41,15 +43,22 @@ $mensajes = $gestorMensajes->getMensajes();
             <section class="messages-display-section">
                 <h2>Mensajes Guardados</h2>
                 <div id="messages-list" class="gallery" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
-                    <?php if (empty($mensajes)): ?>
+                    <?php if (empty($mensajes) || !is_array($mensajes)): ?>
                         <p>Todavía no hay mensajes. ¡Sé el primero en escribir!</p>
                     <?php else: ?>
-                        <?php foreach (array_reverse($mensajes) as $mensaje): ?>
+                        <?php foreach ($mensajes as $mensaje): ?>
                             <article class="card">
                                 <h3><?php echo htmlspecialchars($mensaje['titulo']); ?></h3>
                                 <p><?php echo htmlspecialchars($mensaje['contenido']); ?></p>
                                 <div class="meta" style="margin-top: 1rem;">
-                                    <span class="tag" style="font-size: 0.8rem;"><?php echo htmlspecialchars($mensaje['fecha']); ?></span>
+                                    <?php
+                                        try {
+                                            $fecha = new DateTime($mensaje['created_at']);
+                                            echo '<span class="tag" style="font-size: 0.8rem;">' . $fecha->format('d-m-Y H:i') . '</span>';
+                                        } catch (Exception $e) {
+                                            echo '<span class="tag" style="font-size: 0.8rem;">Fecha inválida</span>';
+                                        }
+                                    ?>
                                 </div>
                             </article>
                         <?php endforeach; ?>
@@ -59,7 +68,7 @@ $mensajes = $gestorMensajes->getMensajes();
         </main>
         
         <footer style="text-align: center; margin-top: 3rem;">
-             <a class="cv-download" href="index.html" style="text-decoration: none;">Volver al Inicio</a>
+             <a class="cv-download" href="/" style="text-decoration: none;">Volver al Inicio</a>
         </footer>
     </div>
 

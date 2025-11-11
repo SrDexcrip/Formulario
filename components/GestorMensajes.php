@@ -1,65 +1,68 @@
 <?php
 
+// Se elimina el require_once y la dependencia del archivo de configuración.
+
 class GestorMensajes {
     private $titulo;
     private $contenido;
-    private $fecha;
+    private $supabase_url;
+    private $supabase_key;
 
-    /**
-     * Constructor que inicializa los datos.
-     * @param string $titulo El título del mensaje.
-     * @param string $contenido El contenido del mensaje.
-     */
-    public function __construct($titulo, $contenido) {
+    // El constructor ahora también recibe las credenciales.
+    public function __construct($titulo, $contenido, $supabase_url, $supabase_key) {
         $this->titulo = $titulo;
         $this->contenido = $contenido;
-        $this->fecha = date('Y-m-d H:i:s'); // Asigna la fecha y hora actual
+        $this->supabase_url = $supabase_url;
+        $this->supabase_key = $supabase_key;
     }
 
-    /**
-     * Guarda los datos en un archivo de texto.
-     * Los datos se guardan en formato JSON, uno por línea.
-     * @return bool Devuelve true si se guardó correctamente, false en caso de error.
-     */
     public function guardar() {
-        $datos = [
+        // La clase ya no usa variables globales, sino sus propias propiedades.
+        $url = "{$this->supabase_url}/rest/v1/mensajes"; 
+
+        $data = [
             'titulo' => $this->titulo,
-            'contenido' => $this->contenido,
-            'fecha' => $this->fecha
+            'contenido' => $this->contenido
         ];
 
-        // Convierte el array a formato JSON y añade un salto de línea
-        $linea = json_encode($datos) . PHP_EOL;
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "apikey: {$this->supabase_key}",
+            "Authorization: Bearer {$this->supabase_key}",
+            "Content-Type: application/json",
+            "Prefer: return=minimal"
+        ]);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
-        // Guarda la línea en el archivo 'mensajes.txt'
-        // FILE_APPEND para añadir al final, LOCK_EX para evitar escrituras simultáneas
-        if (file_put_contents('mensajes.txt', $linea, FILE_APPEND | LOCK_EX) !== false) {
-            return true;
-        } else {
-            return false;
-        }
+        curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        return $httpcode === 201; // 201 Created
     }
 
-    /**
-     * Devuelve el contenido formateado en HTML.
-     * @return string El mensaje formateado en HTML.
-     */
-    public function mostrar() {
-        // Escapa los caracteres especiales para evitar inyección de HTML (XSS)
-        $tituloSeguro = htmlspecialchars($this->titulo, ENT_QUOTES, 'UTF-8');
-        $contenidoSeguro = htmlspecialchars($this->contenido, ENT_QUOTES, 'UTF-8');
-        $fechaSegura = htmlspecialchars($this->fecha, ENT_QUOTES, 'UTF-8');
+    // El método estático ahora debe recibir las credenciales como argumentos.
+    public static function obtenerTodos($supabase_url, $supabase_key) {
+        $url = "{$supabase_url}/rest/v1/mensajes?select=*&order=created_at.desc";
 
-        $html = "
-        <article class='mensaje'>
-            <header>
-                <h2>{$tituloSeguro}</h2>
-                <time datetime='{$fechaSegura}'>{$fechaSegura}</time>
-            </header>
-            <p>{$contenidoSeguro}</p>
-        </article>";
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "apikey: {$supabase_key}",
+            "Authorization: Bearer {$supabase_key}"
+        ]);
 
-        return $html;
+        $response = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpcode === 200) {
+            return json_decode($response, true);
+        } else {
+            return [];
+        }
     }
 }
 

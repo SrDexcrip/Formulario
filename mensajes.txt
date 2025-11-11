@@ -1,2 +1,0 @@
-{"titulo":"Mi primer mensaje","contenido":"Hola, este es el contenido de mi primer mensaje.","fecha":"2024-08-01 10:20:30"}
-{"titulo":"Otro t\u00edtulo","contenido":"Este es otro mensaje para el blog.","fecha":"2024-08-01 10:20:31"}

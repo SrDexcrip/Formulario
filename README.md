@@ -62,44 +62,13 @@ Todas las nuevas páginas PHP (`mensajes.php` y la respuesta de `procesar_formul
 
 ---
 
-## 4. Cómo Ejecutar el Proyecto
-
-Para poner en marcha este proyecto, necesitas tener dos servidores corriendo simultáneamente.
-
-**Prerrequisitos:**
-
-Para poder trabajar con este proyecto en tu máquina local, asegúrate de tener instalado el siguiente software:
-
-- **[Node.js](https://nodejs.org/) (que incluye npm):** Necesario para gestionar las dependencias del frontend y ejecutar el servidor de desarrollo Vite.
-- **[PHP](https://www.php.net/downloads.php):** Necesario para ejecutar el servidor de backend que procesa la lógica del libro de visitas y el formulario de contacto.
-
-**Pasos:**
-
-1.  **Abre una terminal** e inicia el **servidor de Vite** para el frontend:
-    ```bash
-    # Instalar dependencias (solo la primera vez)
-    npm install
-    # Iniciar servidor de desarrollo
-    npm run dev
-    ```
-    Esto levantará el portafolio en una dirección como `http://localhost:5173`.
-
-2.  **Abre una segunda terminal** e **inicia el servidor de PHP** para el backend:
-    ```bash
-    php -S localhost:8000
-    ```
-
-3.  **Accede a la aplicación:** Abre tu navegador y ve a `http://localhost:5173`. Desde allí, podrás usar los botones para navegar a las funcionalidades PHP.
-
----
-
-## 5. Detalles de la Implementación PHP
+## 4. Detalles de la Implementación PHP
 
 ### a. Flujo del Libro de Visitas (Asíncrono)
 
 1.  **Cliente:** El usuario llena el formulario en `mensajes.php`.
 2.  **Solicitud (AJAX):** JavaScript (`mensajes.js`) usa `fetch` para enviar una solicitud `POST` a `guardar_mensaje.php` en segundo plano.
-3.  **Servidor:** `guardar_mensaje.php` procesa los datos y los guarda en `mensajes.txt`.
+3.  **Servidor:** `guardar_mensaje.php` procesa los datos y los guarda en la base de datos de Supabase.
 4.  **Respuesta (JSON):** El servidor devuelve una respuesta JSON indicando éxito o error.
 5.  **Cliente:** JavaScript recibe la respuesta y actualiza el DOM para mostrar el nuevo mensaje o un error, sin recargar la página.
 
@@ -111,29 +80,110 @@ Para poder trabajar con este proyecto en tu máquina local, asegúrate de tener 
 4.  **Respuesta (HTML):** El script genera una página HTML completa como respuesta.
 5.  **Cliente:** El navegador recibe y renderiza la nueva página HTML, mostrando el mensaje de agradecimiento personalizado.
 
-**Ejemplo del script `procesar_formulario.php`:**
+---
 
-```php
-<?php
-header('Content-Type: text/html; charset=utf-8');
+## 5. Guía de Implementación y Ejecución con Supabase
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Recoger los datos del formulario de forma segura
-    $nombre = isset($_POST['nombre']) ? htmlspecialchars($_POST['nombre']) : 'Invitado';
-    $correo = isset($_POST['correo']) ? htmlspecialchars($_POST['correo']) : '';
+Para escalar la aplicación y reemplazar el sistema de archivos de texto (`mensajes.txt`), se migró la persistencia de datos a **Supabase**, una plataforma de Backend as a Service (BaaS) que proporciona una base de datos PostgreSQL.
 
-    // Generar la respuesta personalizada (incluyendo estilos)
-    echo '<link rel="stylesheet" href="styles.css">';
-    echo '<div class="container" style="padding-top: 4rem;">';
-    echo '  <article class="card" style="text-align: center;">';
-    echo "    <h1>¡Gracias por contactarme, {$nombre}!</h1>";
-    echo "    <p>He recibido tu mensaje y te responderé pronto al correo: <strong>{$correo}</strong>.</p>";
-    echo '    <hr>';
-    echo "    <small>Método de solicitud: {$_SERVER['REQUEST_METHOD']}</small>";
-    echo '  </article>';
-    echo '</div>';
-} else {
-    echo "<h1>Acceso no permitido</h1>";
-}
-?>
-```
+Esta sección final sirve como una guía completa que detalla tanto los cambios técnicos realizados como los pasos necesarios para configurar y ejecutar el proyecto desde cero.
+
+### a. Análisis de la Migración a Supabase
+
+1.  **Eliminación del Almacenamiento Local:** Se eliminó el uso del archivo `mensajes.txt`, junto con la clase original `Mensajes.php` que lo gestionaba.
+2.  **Configuración Centralizada:** Se creó un archivo `supabase_config.php` para almacenar las credenciales de la API de Supabase (URL y llave pública anónima), manteniendo la configuración separada del código de la aplicación.
+    ```php
+    <?php
+    // supabase_config.php
+    $supabase_url = 'TU_SUPABASE_URL';
+    $supabase_key = 'TU_SUPABASE_KEY';
+    ?>
+    ```
+3.  **Nueva Lógica de Acceso a Datos (`GestorMensajes.php`):** La clase `GestorMensajes.php` fue completamente reescrita para actuar como un cliente de la API de Supabase.
+    -   **`guardar()`:** Este método ahora construye una solicitud cURL de tipo `POST` al endpoint `/rest/v1/mensajes` de Supabase, enviando los datos del nuevo mensaje en formato JSON.
+    -   **`obtenerTodos()`:** Este método estático realiza una solicitud cURL de tipo `GET` para obtener todos los mensajes, ordenados por fecha de creación descendente (`order=created_at.desc`).
+4.  **Adaptación de Endpoints:**
+    -   `guardar_mensaje.php`: Se actualizó para instanciar el nuevo `GestorMensajes` y llamar a su método `guardar()`.
+    -   `index.php`: Se modificó para usar `GestorMensajes::obtenerTodos()` y renderizar los mensajes recuperados directamente desde la base de datos de Supabase.
+
+### b. Manual de Configuración y Ejecución
+
+Siga esta guía paso a paso para configurar y ejecutar el proyecto completo en su entorno local.
+
+**Paso 1: Instalar Prerrequisitos**
+
+Asegúrese de tener el siguiente software instalado en su sistema:
+
+- **[Node.js](https://nodejs.org/) (versión 18 o superior):** Necesario para gestionar las dependencias del frontend y ejecutar el servidor de desarrollo Vite. Incluye `npm`.
+- **[PHP](https://www.php.net/downloads.php) (versión 8 o superior):** Necesario para ejecutar el servidor de backend que procesa la lógica de la base de datos y los formularios.
+
+**Paso 2: Configurar el Backend con Supabase**
+
+1.  **Crear un Proyecto en Supabase:**
+    -   Vaya a [supabase.com](https://supabase.com), regístrese y cree un nuevo proyecto.
+
+2.  **Crear la Tabla de Mensajes:**
+    -   Dentro de su proyecto de Supabase, vaya al **SQL Editor**.
+    -   Copie y pegue el siguiente script SQL y haga clic en **"RUN"**:
+      ```sql
+      CREATE TABLE public.mensajes (
+        id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+        titulo TEXT,
+        contenido TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      );
+      ```
+
+3.  **Desactivar Row Level Security (RLS):**
+    -   Vaya al **Table Editor**, seleccione la tabla `mensajes`.
+    -   Asegúrese de que la opción **"Enable Row Level Security (RLS)"** esté **DESACTIVADA**. Esto es crucial para permitir que la API de PHP pueda escribir y leer datos sin políticas de seguridad complejas.
+
+4.  **Obtener las Credenciales de la API:**
+    -   En el menú de la izquierda, vaya a **Project Settings -> API**.
+    -   Copie la **URL del Proyecto** y la clave de API **`anon` `public`**.
+
+**Paso 3: Configurar el Proyecto Local**
+
+1.  **Clonar o Descargar el Repositorio:**
+    -   Obtenga todos los archivos del proyecto en una carpeta en su máquina.
+
+2.  **Instalar Dependencias del Frontend:**
+    -   Abra una terminal en la raíz del proyecto y ejecute:
+      ```bash
+      npm install
+      ```
+
+3.  **Configurar las Credenciales de Supabase:**
+    -   Abra el archivo `supabase_config.php`.
+    -   Reemplace los valores de ejemplo con las credenciales que obtuvo en el Paso 2:
+      ```php
+      <?php
+      $supabase_url = 'SU_URL_DE_PROYECTO_SUPABASE';
+      $supabase_key = 'SU_CLAVE_ANON_PUBLIC_SUPABASE';
+      ?>
+      ```
+
+**Paso 4: Ejecutar los Servidores**
+
+Para que la aplicación funcione, necesita tener dos servidores corriendo al mismo tiempo en dos terminales separadas.
+
+1.  **Iniciar Servidor Frontend (Vite):**
+    -   En su primera terminal, ejecute:
+      ```bash
+      npm run dev
+      ```
+    -   Esto iniciará el servidor de desarrollo del frontend, generalmente en `http://localhost:5173`.
+
+2.  **Iniciar Servidor Backend (PHP):**
+    -   Abra una **nueva terminal** en la misma carpeta del proyecto.
+    -   Ejecute el siguiente comando para iniciar el servidor de PHP:
+      ```bash
+      php -S localhost:8000
+      ```
+
+**Paso 5: Acceder a la Aplicación**
+
+1.  **Abra su Navegador:**
+    -   Vaya a la dirección del servidor de Vite: **`http://localhost:5173`**.
+2.  **Navegar a las Funcionalidades del Backend:**
+    -   Desde la página principal, utilice los botones **"Libro de Visitas"** o **"Contacto PHP"** para acceder a las funcionalidades que se conectan con el backend de PHP y la base de datos de Supabase.

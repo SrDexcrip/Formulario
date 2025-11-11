@@ -14,7 +14,7 @@
     <div class="container">
       <header class="site-header">
         <h1>Mensajes Guardados</h1>
-        <a href="index.html">Volver a la galería</a>
+        <a href="index.html">Volver a la galerÃ­a</a>
       </header>
       
       <main>
@@ -22,17 +22,17 @@
 
         require_once 'components/GestorMensajes.php';
 
-        // Ejemplo de cómo leer y mostrar todos los mensajes guardados
-        $mensajesGuardados = file('mensajes.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $mensajes = GestorMensajes::obtenerTodos();
 
-        if ($mensajesGuardados !== false && count($mensajesGuardados) > 0) {
-            foreach ($mensajesGuardados as $linea) {
-                $datos = json_decode($linea, true);
-                if (is_array($datos)) {
-                    // Crea una instancia y muestra el mensaje
-                    $mensaje = new GestorMensajes($datos['titulo'], $datos['contenido']);
-                    echo $mensaje->mostrar();
-                }
+        if (!empty($mensajes)) {
+            foreach ($mensajes as $mensaje) {
+                echo "<article class='mensaje'>";
+                echo "<header>";
+                echo "<h2>" . htmlspecialchars($mensaje['titulo']) . "</h2>";
+                echo "<time datetime='" . $mensaje['created_at'] . "'>" . date('d/m/Y H:i', strtotime($mensaje['created_at'])) . "</time>";
+                echo "</header>";
+                echo "<p>" . htmlspecialchars($mensaje['contenido']) . "</p>";
+                echo "</article>";
             }
         } else {
             echo "<p>No hay mensajes para mostrar.</p>";
