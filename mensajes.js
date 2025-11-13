@@ -1,65 +1,78 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('message-form');
-    const feedbackDiv = document.getElementById('form-feedback');
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('form-mensaje');
+    const feedback = document.getElementById('form-feedback');
+    const listaMensajes = document.getElementById('mensajes-lista');
 
-    form.addEventListener('submit', function(event) {
-        // Evitamos que el formulario se envíe de la forma tradicional (recargando la página)
-        event.preventDefault();
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-        // Obtenemos los valores del formulario
-        const titulo = document.getElementById('titulo').value;
-        const contenido = document.getElementById('contenido').value;
+        const titulo = form.titulo.value;
+        const contenido = form.contenido.value;
 
-        // Creamos un objeto con los datos que enviaremos al servidor
-        const datos = {
-            titulo: titulo,
-            contenido: contenido
-        };
+        // Mostrar feedback usando clases de CSS
+        feedback.className = 'feedback'; // Clase base
+        feedback.textContent = 'Enviando...';
 
-        // Mostramos un mensaje de "Enviando..."
-        feedbackDiv.textContent = 'Enviando mensaje...';
-        feedbackDiv.style.color = 'blue';
+        try {
+            // RUTA CORREGIDA: Apuntar al archivo en la raíz del proyecto
+            const response = await fetch('guardar_mensaje.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ titulo, contenido })
+            });
 
-        // Usamos fetch para enviar los datos a nuestro script de PHP
-        fetch('guardar_mensaje.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datos) // Convertimos nuestro objeto a una cadena JSON
-        })
-        .then(response => {
-            // Primero, verificamos si la respuesta del servidor fue exitosa (código 200-299)
-            if (!response.ok) {
-                // Si no fue exitosa, creamos un error para pasar al siguiente .catch()
-                throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
-            }
-            return response.json(); // Convertimos la respuesta del servidor (que es JSON) a un objeto JavaScript
-        })
-        .then(data => {
-            // Aquí manejamos la respuesta exitosa del servidor
-            if (data.status === 'success') {
-                feedbackDiv.textContent = '¡Mensaje guardado con éxito! La página se recargará.';
-                feedbackDiv.style.color = 'green';
+            const result = await response.json();
 
-                // Limpiamos el formulario
+            if (result.status === 'success') {
+                // Feedback de éxito
+                feedback.classList.add('success');
+                feedback.textContent = '¡Mensaje enviado con éxito!';
                 form.reset();
 
-                // Después de 2 segundos, recargamos la página para ver el nuevo mensaje
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
+                // Añadir el nuevo mensaje a la lista usando la estructura CORRECTA
+                const nuevoMensaje = document.createElement('article');
+                nuevoMensaje.className = 'mensaje'; // Usar la clase correcta
+
+                const fecha = new Date();
+                const fechaFormateada = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1).toString().padStart(2, '0')}/${fecha.getFullYear()} ${fecha.getHours().toString().padStart(2, '0')}:${fecha.getMinutes().toString().padStart(2, '0')}`;
+
+                nuevoMensaje.innerHTML = `
+                    <header>
+                        <h2>${escapeHTML(titulo)}</h2>
+                        <time datetime="${fecha.toISOString()}">${fechaFormateada}</time>
+                    </header>
+                    <p>${escapeHTML(contenido)}</p>
+                `;
+                
+                // Insertar al principio de la lista
+                if (listaMensajes.querySelector('p')) {
+                    // Si estaba el mensaje de "No hay mensajes", se reemplaza
+                    listaMensajes.innerHTML = '';
+                }
+                listaMensajes.prepend(nuevoMensaje);
 
             } else {
-                // Si el servidor nos devuelve un error conocido (ej. datos incompletos)
-                throw new Error(data.message || 'Ocurrió un error desconocido.');
+                throw new Error(result.message || 'Error desconocido al guardar.');
             }
-        })
-        .catch(error => {
-            // Aquí manejamos cualquier error que haya ocurrido durante el fetch
-            console.error('Error al enviar el mensaje:', error);
-            feedbackDiv.textContent = `Error: ${error.message}`;
-            feedbackDiv.style.color = 'red';
-        });
+        } catch (error) {
+            // Feedback de error
+            feedback.className = 'feedback error';
+            feedback.textContent = `Error: ${error.message}`;
+        }
+
+        // Ocultar el mensaje de feedback después de unos segundos
+        setTimeout(() => {
+            feedback.textContent = '';
+            feedback.className = '';
+        }, 5000);
     });
+
+    // Función para escapar HTML y prevenir XSS
+    function escapeHTML(str) {
+        const p = document.createElement('p');
+        p.appendChild(document.createTextNode(str));
+        return p.innerHTML;
+    }
 });

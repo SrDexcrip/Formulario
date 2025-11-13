@@ -1,75 +1,63 @@
 <?php
-// Incluir la configuración y la clase, asegurando que las rutas sean correctas.
-require_once 'supabase_config.php';
 require_once 'components/GestorMensajes.php';
+require_once 'supabase_config.php'; // Incluir la configuración de Supabase
 
-// Pasar las credenciales al método estático para obtener los mensajes.
+// Pasar las credenciales a la función para obtener los mensajes
 $mensajes = GestorMensajes::obtenerTodos($supabase_url, $supabase_key);
 ?>
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Libro de Visitas</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
     <div class="container">
         <header class="site-header">
             <h1>Libro de Visitas</h1>
-            <p>Deja tu mensaje para demostrar que el backend con PHP funciona.</p>
+            <p>Deja tu mensaje y conéctate. Los mensajes se guardan en Supabase vía PHP.</p>
+            <a href="index.html" class="btn-back">Volver al Portafolio</a>
         </header>
 
-        <main>
-            <section class="card" style="margin-bottom: 2rem;">
-                <h2 style="margin-top: 0;">Deja tu Mensaje</h2>
-                <form id="message-form">
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label for="titulo" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Título</label>
-                        <input type="text" id="titulo" name="titulo" required style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 8px; font-family: 'Inter', sans-serif;">
+        <article class="card" id="nuevo-mensaje-card">
+            <div class="card-form">
+                <form id="form-mensaje">
+                    <h2>Nuevo Mensaje</h2>
+                    <div class="form-group">
+                        <label for="titulo">Título</label>
+                        <input type="text" id="titulo" name="titulo" required>
                     </div>
-                    <div class="form-group" style="margin-bottom: 1.5rem;">
-                        <label for="contenido" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Mensaje</label>
-                        <textarea id="contenido" name="contenido" rows="4" required style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 8px; font-family: 'Inter', sans-serif; resize: vertical;"></textarea>
+                    <div class="form-group">
+                        <label for="contenido">Mensaje</label>
+                        <textarea id="contenido" name="contenido" rows="3" required></textarea>
                     </div>
-                    <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem; border: none; font-size: 1rem; cursor: pointer;">Enviar Mensaje</button>
-                    <div id="form-feedback" style="margin-top: 1rem; text-align: center;"></div>
+                    <button type="submit" id="guardar-mensaje">Enviar Mensaje</button>
                 </form>
-            </section>
+                <div id="form-feedback"></div>
+            </div>
+        </article>
 
-            <section class="messages-display-section">
-                <h2>Mensajes Guardados</h2>
-                <div id="messages-list" class="gallery" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
-                    <?php if (empty($mensajes) || !is_array($mensajes)): ?>
-                        <p>Todavía no hay mensajes. ¡Sé el primero en escribir!</p>
-                    <?php else: ?>
-                        <?php foreach ($mensajes as $mensaje): ?>
-                            <article class="card">
-                                <h3><?php echo htmlspecialchars($mensaje['titulo']); ?></h3>
-                                <p><?php echo htmlspecialchars($mensaje['contenido']); ?></p>
-                                <div class="meta" style="margin-top: 1rem;">
-                                    <?php
-                                        try {
-                                            $fecha = new DateTime($mensaje['created_at']);
-                                            echo '<span class="tag" style="font-size: 0.8rem;">' . $fecha->format('d-m-Y H:i') . '</span>';
-                                        } catch (Exception $e) {
-                                            echo '<span class="tag" style="font-size: 0.8rem;">Fecha inválida</span>';
-                                        }
-                                    ?>
-                                </div>
-                            </article>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-            </section>
-        </main>
-        
-        <footer style="text-align: center; margin-top: 3rem;">
-             <a class="cv-download" href="/" style="text-decoration: none;">Volver al Inicio</a>
-        </footer>
+        <section class="messages-section">
+            <h2>Mensajes Recientes</h2>
+            <div id="mensajes-lista">
+                <?php if (is_array($mensajes) && !empty($mensajes)): ?>
+                    <?php foreach ($mensajes as $mensaje): ?>
+                        <article class="mensaje">
+                            <header>
+                                <h2><?= htmlspecialchars($mensaje['titulo']) ?></h2>
+                                <time datetime="<?= $mensaje['created_at'] ?>"><?= date('d/m/Y H:i', strtotime($mensaje['created_at'])) ?></time>
+                            </header>
+                            <p><?= htmlspecialchars($mensaje['contenido']) ?></p>
+                        </article>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p>No hay mensajes todavía. ¡Sé el primero!</p>
+                <?php endif; ?>
+            </div>
+        </section>
     </div>
 
     <script src="mensajes.js"></script>
